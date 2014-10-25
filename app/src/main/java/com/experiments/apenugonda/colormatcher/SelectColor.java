@@ -1,22 +1,19 @@
 package com.experiments.apenugonda.colormatcher;
 
-import android.app.Activity;
-
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.content.Context;
-import android.os.Build;
+import android.hardware.Camera;
 import android.os.Bundle;
-import android.view.Gravity;
+import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.support.v4.widget.DrawerLayout;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
+import android.widget.FrameLayout;
 
 
 public class SelectColor extends Activity
@@ -49,11 +46,20 @@ public class SelectColor extends Activity
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
-        // update the main content by replacing fragments
         FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
-                .commit();
+        // update the main content by replacing fragments
+        switch (position) {
+            case 0:
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, new CameraFragment())
+                        .commit();
+                break;
+            case 1:
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+                        .commit();
+                break;
+        }
     }
 
     public void onSectionAttached(int number) {
@@ -63,9 +69,6 @@ public class SelectColor extends Activity
                 break;
             case 2:
                 mTitle = getString(R.string.title_section2);
-                break;
-            case 3:
-                mTitle = getString(R.string.title_section3);
                 break;
         }
     }
@@ -140,6 +143,71 @@ public class SelectColor extends Activity
             super.onAttach(activity);
             ((SelectColor) activity).onSectionAttached(
                     getArguments().getInt(ARG_SECTION_NUMBER));
+        }
+    }
+
+    /**
+     * A fragment that allows for getting Camera input
+     */
+    public class CameraFragment extends Fragment {
+        private CameraView mPreview;
+        private Camera mCamera;
+        private Activity thisActivity;
+
+        public Camera getCameraInstance() {
+            Camera c = null;
+            try {
+                c = Camera.open();
+            }
+            catch (Exception e) {
+                // Alert that camera is not available
+            }
+            return c;
+        }
+
+        public CameraFragment() {
+            mCamera = getCameraInstance();
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            View view = inflater.inflate(R.layout.sample_camera_view, container, false);
+
+            return view;
+            //View rootView = inflater.inflate(R.layout.fragment_select_color, container, false);
+            //return rootView;
+        }
+
+        @Override
+        public void onResume() {
+            super.onResume();
+
+            try {
+                mCamera.reconnect();
+            } catch (Exception e) {
+                mCamera = getCameraInstance();
+                Log.d("Camera", "Failed to reconnect to Camera: " + e.toString());
+            }
+            //Set orientation to always be vertical
+            mCamera.setDisplayOrientation(90);
+
+            mPreview = new CameraView(thisActivity, mCamera);
+            FrameLayout layout = (FrameLayout)findViewById(R.id.camera_preview);
+            layout.addView(mPreview);
+        }
+
+        @Override
+        public void onPause() {
+            super.onPause();
+
+            mCamera.stopPreview();
+            mCamera.release();
+        }
+
+        @Override
+        public void onAttach(Activity activity) {
+            super.onAttach(activity);
+            thisActivity = activity;
         }
     }
 
