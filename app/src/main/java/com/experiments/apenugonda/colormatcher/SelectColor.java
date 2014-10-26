@@ -19,6 +19,11 @@ import android.widget.FrameLayout;
 public class SelectColor extends Activity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
+    boolean isCameraActive = false;
+    boolean isPrevPalettesActive = false;
+    PlaceholderFragment testFragment;
+    CameraFragment cameraFragment;
+
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -50,14 +55,37 @@ public class SelectColor extends Activity
         // update the main content by replacing fragments
         switch (position) {
             case 0:
-                fragmentManager.beginTransaction()
-                        .replace(R.id.container, new CameraFragment())
-                        .commit();
+                if (!isCameraActive) {
+                    cameraFragment = new CameraFragment();
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.container, cameraFragment)
+                            .addToBackStack("Camera")
+                            .commit();
+                    isCameraActive = true;
+                } else {
+                    if (testFragment != null && testFragment.isAdded()) {
+                        fragmentManager.beginTransaction()
+                                .show(cameraFragment)
+                                .hide(testFragment)
+                                .commit();
+                    }
+                    //fragmentManager.popBackStackImmediate("Camera", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                }
                 break;
             case 1:
-                fragmentManager.beginTransaction()
-                        .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
-                        .commit();
+                if (!isPrevPalettesActive) {
+                    testFragment = PlaceholderFragment.newInstance(position + 1);
+                    fragmentManager.beginTransaction()
+                            .add(R.id.container, testFragment)
+                            .hide(cameraFragment)
+                            .commit();
+                    isPrevPalettesActive = true;
+                } else {
+                    fragmentManager.beginTransaction()
+                            .show(testFragment)
+                            .hide(cameraFragment)
+                            .commit();
+                }
                 break;
         }
     }
@@ -201,6 +229,8 @@ public class SelectColor extends Activity
             super.onPause();
 
             mCamera.stopPreview();
+            FrameLayout layout = (FrameLayout)findViewById(R.id.camera_preview);
+            layout.removeView(mPreview);
             mCamera.release();
         }
 
@@ -208,6 +238,8 @@ public class SelectColor extends Activity
         public void onAttach(Activity activity) {
             super.onAttach(activity);
             thisActivity = activity;
+            ((SelectColor) activity).onSectionAttached(1); //First Activity
+            // TODO: Change call to use a stored number
         }
     }
 
