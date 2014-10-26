@@ -38,7 +38,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
-        // TODO: Release in activity
+
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {

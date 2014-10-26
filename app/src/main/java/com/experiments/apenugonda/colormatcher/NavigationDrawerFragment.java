@@ -11,6 +11,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -120,7 +121,7 @@ public class NavigationDrawerFragment extends Fragment {
      * @param fragmentId   The android:id of this fragment in its activity's layout.
      * @param drawerLayout The DrawerLayout containing this fragment's UI.
      */
-    public void setUp(int fragmentId, DrawerLayout drawerLayout) {
+    public void setUp(int fragmentId, final DrawerLayout drawerLayout) {
         mFragmentContainerView = getActivity().findViewById(fragmentId);
         mDrawerLayout = drawerLayout;
 
@@ -142,6 +143,11 @@ public class NavigationDrawerFragment extends Fragment {
                 R.string.navigation_drawer_close  /* "close drawer" description for accessibility */
         ) {
             @Override
+            public void onDrawerSlide(View drawerView, float slide) {
+                drawerView.bringToFront();
+            }
+
+            @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
                 if (!isAdded()) {
@@ -152,11 +158,12 @@ public class NavigationDrawerFragment extends Fragment {
             }
 
             @Override
-            public void onDrawerOpened(View drawerView) {
+            public void onDrawerOpened(final View drawerView) {
                 super.onDrawerOpened(drawerView);
                 if (!isAdded()) {
                     return;
                 }
+
 
                 if (!mUserLearnedDrawer) {
                     // The user manually opened the drawer; store this flag to prevent auto-showing
@@ -166,8 +173,8 @@ public class NavigationDrawerFragment extends Fragment {
                             .getDefaultSharedPreferences(getActivity());
                     sp.edit().putBoolean(PREF_USER_LEARNED_DRAWER, true).apply();
                 }
-
                 getActivity().invalidateOptionsMenu(); // calls onPrepareOptionsMenu()
+
             }
         };
 
@@ -243,7 +250,19 @@ public class NavigationDrawerFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
+        if (item != null && item.getItemId() == 0x0102002c) {
+            if (mDrawerLayout.isDrawerVisible(GravityCompat.START)) {
+                mDrawerLayout.closeDrawer(GravityCompat.START);
+            } else {
+                Runnable openDrawer = new Runnable() {
+                    @Override
+                    public void run() {
+                        mDrawerLayout.openDrawer(Gravity.LEFT);
+                    }
+                };
+
+                getActivity().runOnUiThread(openDrawer);
+            }
             return true;
         }
 

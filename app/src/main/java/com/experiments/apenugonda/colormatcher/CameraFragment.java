@@ -36,10 +36,7 @@ public class CameraFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.sample_camera_view, container, false);
-
         return view;
-        //View rootView = inflater.inflate(R.layout.fragment_select_color, container, false);
-        //return rootView;
     }
 
     @Override

@@ -110,8 +110,8 @@ public class SelectColor extends Activity
     public boolean onCreateOptionsMenu(Menu menu) {
         if (!mNavigationDrawerFragment.isDrawerOpen()) {
             // Only show items in the action bar relevant to this screen
-            // if the drawer is not showing. Otherwise, let the drawer
-            // decide what to show in the action bar.
+            // if the drawer is not showing. //Otherwise, let the drawer
+            // decide what to show in th//e action bar.
             getMenuInflater().inflate(R.menu.select_color, menu);
             restoreActionBar();
             return true;
@@ -170,5 +170,4 @@ public class SelectColor extends Activity
                     getArguments().getInt(ARG_SECTION_NUMBER));
         }
     }
-
 }
