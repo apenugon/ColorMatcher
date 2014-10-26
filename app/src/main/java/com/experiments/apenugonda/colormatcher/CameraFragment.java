@@ -18,6 +18,17 @@ public class CameraFragment extends Fragment {
     private Camera mCamera;
     private Activity thisActivity;
 
+    private Camera.PictureCallback mPicture = new Camera.PictureCallback() {
+
+        @Override
+        public void onPictureTaken(byte[] data, Camera camera) {
+
+            Log.d("Camera", "Got Picture!");
+
+            mCamera.startPreview();
+        }
+    };
+
     public Camera getCameraInstance() {
         Camera c = null;
         try {
@@ -55,6 +66,16 @@ public class CameraFragment extends Fragment {
         mPreview = new CameraView(thisActivity, mCamera);
         FrameLayout layout = (FrameLayout)thisActivity.findViewById(R.id.camera_preview);
         layout.addView(mPreview);
+        View button = thisActivity.findViewById(R.id.shutter);
+        button.bringToFront();
+        button.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mCamera.takePicture(null, null, mPicture);
+                    }
+                }
+        );
     }
 
     @Override
@@ -74,4 +95,6 @@ public class CameraFragment extends Fragment {
         ((SelectColor) activity).onSectionAttached(1); //First Activity
         // TODO: Change call to use a stored number
     }
+
+
 }
